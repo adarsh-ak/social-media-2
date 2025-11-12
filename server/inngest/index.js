@@ -2,7 +2,7 @@ import { Inngest } from "inngest";
 import User from '../models/User.js'
 
 // Create a client to send and receive events
-export const inngest = new Inngest({ id: "social-media-2" });
+export const inngest = new Inngest({ id: "social_media_2" });
 
 
 // Inngest Function to save user data to a database
