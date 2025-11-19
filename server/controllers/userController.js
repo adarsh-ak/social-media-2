@@ -225,52 +225,84 @@ export const sendConnectionRequest = async (req, res)=> {
 
 
 // Get User Connections
-export const getUserConnections = async (req, res)=> {
+export const getUserConnections = async (req, res) => {
     try {
-        const {userId}=req.auth()
-        const user = await User.findById(userId).populate('connections followers following')
-
-        const connections=user.connections
-        const followers = user.followers
-        const following =user.following
-
-        const pendingConnections = (await Connection.find({to_user_id: userId, status: 'pending'}).populate('from_user_id')).map(connection=>connection.from_user_id)
-
-        res.json({success: true,connections, followers, following, pendingConnections})
+        const authData = req.auth();
+        console.log('Auth data:', authData); // Debug
+        
+        const { userId } = authData;
+        console.log('User ID:', userId); // Debug
+        
+        if (!userId) {
+            return res.json({ success: false, message: 'User ID not found in auth' });
+        }
+        
+        const user = await User.findById(userId).populate('connections followers following');
+        console.log('User found:', user ? 'Yes' : 'No'); // Debug
+        
+        if (!user) {
+            return res.json({ success: false, message: 'User not found in database' });
+        }
+        
+        const connections = user.connections || [];
+        const followers = user.followers || [];
+        const following = user.following || [];
+        
+        const pendingConnectionsData = await Connection.find({
+            to_user_id: userId, 
+            status: 'pending'
+        }).populate('from_user_id');
+        
+        const pendingConnections = pendingConnectionsData
+            .map(connection => connection.from_user_id)
+            .filter(user => user !== null);
+        
+        res.json({
+            success: true,
+            connections,
+            followers,
+            following,
+            pendingConnections
+        });
     } catch (error) {
-        console.log(error);
-        res.json({success: false, message: error.message})
+        console.error('Error in getUserConnections:', error);
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 // Accept Connection Request
-export const acceptConnectionRequest = async (req, res)=>{
-    try{
-        const {userId}=req.auth()
-        const {id}=req.body;
+export const acceptConnectionRequest = async (req, res) => {
+    try {
+        const { userId } = req.auth();
+        const { id } = req.body;
 
-        const connection = await Connection.findOne({from_user_id: id,to_user_id: userId})
+        const connection = await Connection.findOne({ 
+            from_user_id: id, 
+            to_user_id: userId 
+        });
 
-        if(!connection){
-            return res.json({success: false, message: 'Connection not found'})
+        if (!connection) {
+            return res.json({ success: false, message: 'Connection not found' });
         }
-        const user = await User.findById(userId);
-        user.connections.push(id);
-        await user.save()
 
-        const toUser= await User.findById(id);
-        toUser.connections.push(userId);
-        await toUser.save()
+        // Use $addToSet to automatically prevent duplicates
+        await User.findByIdAndUpdate(userId, {
+            $addToSet: { connections: id }
+        });
 
-        connection.status='accepted';
-        await connection.save()
+        await User.findByIdAndUpdate(id, {
+            $addToSet: { connections: userId }
+        });
 
-        res.json({success: true,message: 'Connection accepted successfully'});
-    }catch(error){
+        connection.status = 'accepted';
+        await connection.save();
+
+        res.json({ success: true, message: 'Connection accepted successfully' });
+    } catch (error) {
         console.log(error);
-        res.json({success: false, message: error.message})
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 // Get User Profiles
 export const getUserProfiles = async (req,res)=>{
