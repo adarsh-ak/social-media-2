@@ -6,6 +6,10 @@ import group_users from './group_users.png'
 import { Home, MessageCircle, Search, UserIcon, Users } from 'lucide-react'
 import sponsored_img from './sponsored_img.png'
 
+// this file is used to add posts in the page if person has no connections
+
+
+
 export const assets = {
     logo,
     sample_cover,
@@ -122,6 +126,18 @@ export const dummyStoriesData = [
 
 
 export const dummyPostsData = [
+    {
+        "_id": "68773e977db16954a783839c",
+        "user": dummyUserData,
+        "content": "This is a Welcome post",
+        "image_urls": [
+            "https://www.inspireuplift.com/resizer/?image=https://cdn.inspireuplift.com/uploads/images/seller_products/1692877383_SunflowerSVGBundleWelcomeSVGPorchSignSVGDigitalDownloadCutFilesSublimationClipartincludes12svgpngdxffileformats-6.jpg&width=600&height=600&quality=90&format=auto&fit=pad"
+        ],
+        "post_type": "text_with_image",
+        "likes_count": [],
+        "createdAt": "2025-07-16T05:54:31.191Z",
+        "updatedAt": "2025-07-16T05:54:31.191Z",
+    },
     {
         "_id": "68773e977db16954a783839c",
         "user": dummyUserData,

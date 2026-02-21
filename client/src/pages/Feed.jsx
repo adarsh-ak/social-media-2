@@ -7,12 +7,15 @@ import RecentMessages from '../components/RecentMessages'
 import { useAuth } from '@clerk/clerk-react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
+import { useSelector } from 'react-redux'
 
 const Feed = () => {
-
+  const { connections } = useSelector((state) => state.connections)
   const [feeds,setFeeds]=useState([])
   const [loading,setLoading]=useState(true)
   const {getToken} = useAuth()
+
+  const isNewUser = connections.length === 0
 
   const fetchFeeds=async()=>{
     try {
@@ -34,6 +37,7 @@ const Feed = () => {
     fetchFeeds()
   },[])
 
+  const displayedPosts = isNewUser ? dummyPostsData : feeds
 
   return !loading ? (
     <div className='h-full overflow-y-scroll no-scrollbar py-10 xl:pr-5 flex items-start justify-center xl:gap-8'>
@@ -41,12 +45,14 @@ const Feed = () => {
       <div>
         <StoriesBar />
         <div className='p-4 space-y-6'>
-          {feeds.map((post)=>(
+          {displayedPosts.map((post)=>(
             <PostCard key={post._id} post={post}/>
           ))}
         </div>
       </div>
 
+          
+      
       {/* Right Sidebar */}
       <div className='max-xl:hidden sticky top-0'>
         <div className='max-w-xs bg-white text-xs p-4 rounded-md inline-flex flex-col gap-2 shadow'>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { assets, dummyUserData } from '../assets/assets'
+import { assets } from '../assets/assets'
 import MenuItems from './MenuItems'
 import { CirclePlus, LogOut } from 'lucide-react'
 import { useClerk, UserButton } from '@clerk/clerk-react'
